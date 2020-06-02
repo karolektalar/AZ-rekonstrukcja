@@ -8,7 +8,7 @@ matrix_1 = np.array([
 ])
 
 
-def create_upper_triangular_matrix(matrix: np.array):
+def create_upper_triangular_matrix(matrix: np.array) -> np.array:
     # Tworzymy macierz górnotrójkątną żeby uniknąć niejednoznaczności
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
@@ -17,13 +17,13 @@ def create_upper_triangular_matrix(matrix: np.array):
     return matrix
 
 
-def find_smallest_distance_coordinates_in_matrix(matrix: np):
+def find_smallest_distance_coordinates_in_matrix(matrix: np) -> int:
     # Maskujemy w macierzy wartości, dzięki czemu przy wielu najmniejszych wartościach łatwo możemy po nich iterować
     tmp = np.ma.MaskedArray(matrix, matrix <= 0)
     return np.unravel_index(tmp.argmin(), tmp.shape)
 
 
-def create_distances_matrix_to_merge_vertex(matrix: np, a, b):
+def create_distances_matrix_to_merge_vertex(matrix: np, a, b) -> np.array:
     distances_to_merge_vertex = np.zeros(len(matrix))
     for i in range(len(matrix)):
         if not i == a and not i == b:
@@ -42,7 +42,7 @@ def create_distances_matrix_to_merge_vertex(matrix: np, a, b):
     return distances_to_merge_vertex
 
 
-def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex):
+def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex) -> [True, False]:
     for i in range(len(matrix)):
         if not i == a and not i == b:
             if a > i and b > i:
@@ -73,6 +73,7 @@ def make_graph_from_leaves(matrix):
         print("true")
     else:
         print("false")
+
 
 if __name__ == '__main__':
     make_graph_from_leaves(matrix_1)
