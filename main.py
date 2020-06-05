@@ -1,5 +1,8 @@
 import numpy as np
 from glob import glob
+import matplotlib.pyplot as plt
+import networkx as nx
+import pandas as pd
 
 matrix_1 = np.array([
     [0, 2, 2, 2],
@@ -204,7 +207,11 @@ def run():
                 input_matrix = np.loadtxt(file, delimiter=",", skiprows=rows_to_skip)
                 res = make_graph_from_leaves(input_matrix)
                 output_file.write(f"\n*******************************   OUTPUT DLA PLIKU {file}    *******************************\n")
+
                 output_file.write(str(res))
+                G = nx.from_numpy_array(res)
+                nx.draw(G)
+                plt.show()
         output_file.close()
     except OSError:
         print("Plik wejsciowy nie znaleziony. Prosze stworzyc plik input.csv w tym katalogu")
