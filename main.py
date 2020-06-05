@@ -1,5 +1,5 @@
 import numpy as np
-import math
+import pandas as pd
 
 matrix_1 = np.array([
     [0, 2, 2, 2],
@@ -8,11 +8,11 @@ matrix_1 = np.array([
     [2, 2, 2, 0],
 ])
 # przyklad w ktorym pierwsza para jest zla
-matrix_2 = np.array([
-    # [0, 2, 3, 3],
-    # [2, 0, 3, 3],
-    # [3, 3, 0, 2],
-    # [3, 3, 2, 0]
+# matrix_2 = np.array([
+#     [0, 2, 3, 3],
+#     [2, 0, 3, 3],
+#     [3, 3, 0, 2],
+#     [3, 3, 2, 0]
     # [0, 3, 2, 3, 5, 3],
     # [3, 0, 3, 2, 4, 2],
     # [2, 3, 0, 3, 5, 3],
@@ -20,19 +20,18 @@ matrix_2 = np.array([
     # [5, 4, 5, 4, 0, 4],
     # [3, 2, 3, 2, 4, 0]
 
-    [0, 3, 2, 3, 5, 3, 4, 5, 5, 3],
-    [3, 0, 3, 2, 4, 2, 3, 4, 4, 2],
-    [2, 3, 0, 3, 5, 3, 4, 5, 5, 3],
-    [3, 2, 3, 0, 4, 2, 3, 4, 4, 2],
-    [5, 4, 5, 4, 0, 4, 3, 2, 2, 4],
-    [3, 2, 3, 2, 4, 0, 3, 4, 4, 2],
-    [4, 3, 4, 3, 3, 3, 0, 3, 3, 3],
-    [5, 4, 5, 4, 2, 4, 3, 0, 2, 4],
-    [5, 4, 5, 4, 2, 4, 3, 2, 0, 4],
-    [3, 2, 3, 2, 4, 2, 3, 4, 4, 0]
+    # [0, 3, 2, 3, 5, 3, 4, 5, 5, 3],
+    # [3, 0, 3, 2, 4, 2, 3, 4, 4, 2],
+    # [2, 3, 0, 3, 5, 3, 4, 5, 5, 3],
+    # [3, 2, 3, 0, 4, 2, 3, 4, 4, 2],
+    # [5, 4, 5, 4, 0, 4, 3, 2, 2, 4],
+    # [3, 2, 3, 2, 4, 0, 3, 4, 4, 2],
+    # [4, 3, 4, 3, 3, 3, 0, 3, 3, 3],
+    # [5, 4, 5, 4, 2, 4, 3, 0, 2, 4],
+    # [5, 4, 5, 4, 2, 4, 3, 2, 0, 4],
+    # [3, 2, 3, 2, 4, 2, 3, 4, 4, 0]
 
-])
-
+# ])
 
 
 def create_upper_triangular_matrix(matrix: np.array) -> np.array:
@@ -88,7 +87,8 @@ def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex) 
                     return False
     return True
 
-#TODO nie działa coś z mergeindex i się źle merguje :(
+
+# TODO nie działa coś z mergeindex i się źle merguje :(
 def merge_subgraphs(new_subgraph, first_subgraph, first: bool):
     merged_subgraph = new_subgraph
     add_edge = False
@@ -187,11 +187,23 @@ def make_graph_from_leaves(matrix):
                 return -1
 
     print(merged_subgraph)
-        # TODO : remove X and Y from B, add Z to B' --> DONE
-        # TODO : swap X and Y and repeat the steps if false --> DONE
-        # TODO : if there is no more pairs to choose return -1 -> to mozna zrobic jesli macierz is fully masked to -1 [Wydaje mi sie ze DONE]
-        # TODO : repeat steps until there are two trees in S --> wydaje mi sie ze DONE
+
+
+def run():
+    # look for input.csv
+    try :
+        input_matrix = np.loadtxt("input.csv", delimiter=",")
+        make_graph_from_leaves(input_matrix)
+    except OSError:
+        print("Plik wejsciowy nie znaleziony. Prosze stworzyc plik input.csv w tym katalogu")
+
 
 
 if __name__ == '__main__':
-    make_graph_from_leaves(matrix_2)
+    run()
+
+
+# TODO : zrobic plik wykonywalny
+# TODO : przygotowac pliki testowe - Done
+# TODO : szukam pliku wejsciowego w katalogu z zadaniem - Done
+# TODO : generator instancji
