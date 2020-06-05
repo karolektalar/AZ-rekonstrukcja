@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+from glob import glob
 
 matrix_1 = np.array([
     [0, 2, 2, 2],
@@ -187,16 +187,27 @@ def make_graph_from_leaves(matrix):
                 return -1
 
     print(merged_subgraph)
+    return merged_subgraph
 
 
 def run():
+
     # look for input.csv
-    try :
-        input_matrix = np.loadtxt("input.csv", delimiter=",", skiprows=1)
-        make_graph_from_leaves(input_matrix)
+    input_files = glob('*.txt') + glob('*.csv')
+    output_file = open('result.txt', 'w')
+    try:
+        for file in input_files:
+            if file != 'requirements.txt' and file != "result.txt":
+                rows_to_skip = 0
+                if 'csv' in file:
+                    rows_to_skip = 1
+                input_matrix = np.loadtxt(file, delimiter=",", skiprows=rows_to_skip)
+                res = make_graph_from_leaves(input_matrix)
+                output_file.write(f"\n*******************************   OUTPUT DLA PLIKU {file}    *******************************\n")
+                output_file.write(str(res))
+        output_file.close()
     except OSError:
         print("Plik wejsciowy nie znaleziony. Prosze stworzyc plik input.csv w tym katalogu")
-
 
 
 if __name__ == '__main__':
