@@ -19,6 +19,7 @@ matrix_2 = np.array([
     # [3, 2, 3, 0, 4, 2],
     # [5, 4, 5, 4, 0, 4],
     # [3, 2, 3, 2, 4, 0]
+
     [0, 3, 2, 3, 5, 3, 4, 5, 5, 3],
     [3, 0, 3, 2, 4, 2, 3, 4, 4, 2],
     [2, 3, 0, 3, 5, 3, 4, 5, 5, 3],
@@ -29,7 +30,6 @@ matrix_2 = np.array([
     [5, 4, 5, 4, 2, 4, 3, 0, 2, 4],
     [5, 4, 5, 4, 2, 4, 3, 2, 0, 4],
     [3, 2, 3, 2, 4, 2, 3, 4, 4, 0]
-
 
 ])
 
@@ -89,18 +89,26 @@ def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex) 
     return True
 
 #TODO nie działa coś z mergeindex i się źle merguje :(
-def merge_subgraphs(new_subgraph, first_subgraph):
+def merge_subgraphs(new_subgraph, first_subgraph, first: bool):
     merged_subgraph = new_subgraph
     add_edge = False
     if not type(first_subgraph) == type(0):
         new_subgraph_merge_idx = np.unravel_index(new_subgraph.argmax(), new_subgraph.shape)[0]
         merge_idx = np.unravel_index(first_subgraph.argmax(), first_subgraph.shape)
-        if new_subgraph_merge_idx == len(new_subgraph[0])-1:
-            add_edge = True
+        if first:
+            if new_subgraph_merge_idx == 0:
+                add_edge = True
+            deleted_column = new_subgraph[0, :]
+            deleted_column = np.delete(deleted_column, 0, 0)
+            new_subgraph = np.delete(new_subgraph, 0, 0)
+            new_subgraph = np.delete(new_subgraph, 0, 1)
+        else:
+            if new_subgraph_merge_idx == len(new_subgraph[0])-1:
+                add_edge = True
+            deleted_column = new_subgraph[:, len(new_subgraph[0]) - 1]
+            new_subgraph = np.delete(new_subgraph, len(new_subgraph[0]) - 1, 0)
+            new_subgraph = np.delete(new_subgraph, len(new_subgraph[0]) - 1, 1)
         first_subgraph[merge_idx] = 0
-        deleted_column = new_subgraph[:, len(new_subgraph[0])-1]
-        new_subgraph = np.delete(new_subgraph, len(new_subgraph[0])-1, 0)
-        new_subgraph = np.delete(new_subgraph, len(new_subgraph[0])-1, 1)
         tmp = np.zeros((len(new_subgraph[0]), len(first_subgraph[0])))
         tmp = np.concatenate((first_subgraph, tmp))
         tmp2 = np.zeros((len(first_subgraph[0]), len(new_subgraph[0])))
@@ -143,8 +151,14 @@ def make_graph_from_leaves(matrix):
             for i in range(smallest_distance):
                 new_subgraph[i][i+1] = 1
             new_subgraph[int(distances_to_merge_vertex_difference)][int(distances_to_merge_vertex_difference)] = 2
-            merged_subgraph = merge_subgraphs(new_subgraph, first_subgraph)
-            merged_subgraph = merge_subgraphs(merged_subgraph, second_subgraph)
+            print("test")
+            print(np.unravel_index(new_subgraph.argmax(), new_subgraph.shape))
+            print(new_subgraph)
+            merged_subgraph = merge_subgraphs(new_subgraph, first_subgraph, True)
+            print(np.unravel_index(merged_subgraph.argmax(), merged_subgraph.shape))
+            print(merged_subgraph)
+            print("\n\n\n")
+            merged_subgraph = merge_subgraphs(merged_subgraph, second_subgraph, False)
             # Stworzenie macierzy B' w której X i Y sa usunenie a Z jest dodane
             new_masked_matrix.mask = np.ma.nomask
             b = np.hstack((new_masked_matrix, np.atleast_2d(distances_to_merge_vertex).T))
@@ -157,8 +171,8 @@ def make_graph_from_leaves(matrix):
             subgraphs_matrix.pop(max(smallest_distance_idx[0], smallest_distance_idx[1]))
             subgraphs_matrix.pop(min(smallest_distance_idx[0], smallest_distance_idx[1]))
             subgraphs_matrix.append(merged_subgraph)
-            print("merged subgraphs")
-            print(merged_subgraph)
+            # print("merged subgraphs")
+
             bad_pair = False
 
         else:
@@ -172,7 +186,7 @@ def make_graph_from_leaves(matrix):
                 # in this step we can return -1, non any pair from input create valid pair
                 return -1
 
-
+    print(merged_subgraph)
         # TODO : remove X and Y from B, add Z to B' --> DONE
         # TODO : swap X and Y and repeat the steps if false --> DONE
         # TODO : if there is no more pairs to choose return -1 -> to mozna zrobic jesli macierz is fully masked to -1 [Wydaje mi sie ze DONE]
