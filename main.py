@@ -192,7 +192,7 @@ def make_graph_from_leaves(matrix):
 def run():
     # look for input.csv
     try :
-        input_matrix = np.loadtxt("input.csv", delimiter=",")
+        input_matrix = np.loadtxt("input.csv", delimiter=",", skiprows=1)
         make_graph_from_leaves(input_matrix)
     except OSError:
         print("Plik wejsciowy nie znaleziony. Prosze stworzyc plik input.csv w tym katalogu")
