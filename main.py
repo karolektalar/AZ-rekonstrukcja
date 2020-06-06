@@ -91,7 +91,6 @@ def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex) 
     return True
 
 
-# TODO nie działa coś z mergeindex i się źle merguje :(
 def merge_subgraphs(new_subgraph, first_subgraph, first: bool):
     merged_subgraph = new_subgraph
     add_edge = False
