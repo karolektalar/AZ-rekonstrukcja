@@ -10,32 +10,6 @@ matrix_1 = np.array([
     [2, 2, 0, 2],
     [2, 2, 2, 0],
 ])
-# przyklad w ktorym pierwsza para jest zla
-# matrix_2 = np.array([
-#     [0, 2, 3, 3],
-#     [2, 0, 3, 3],
-#     [3, 3, 0, 2],
-#     [3, 3, 2, 0]
-    # [0, 3, 2, 3, 5, 3],
-    # [3, 0, 3, 2, 4, 2],
-    # [2, 3, 0, 3, 5, 3],
-    # [3, 2, 3, 0, 4, 2],
-    # [5, 4, 5, 4, 0, 4],
-    # [3, 2, 3, 2, 4, 0]
-
-    # [0, 3, 2, 3, 5, 3, 4, 5, 5, 3],
-    # [3, 0, 3, 2, 4, 2, 3, 4, 4, 2],
-    # [2, 3, 0, 3, 5, 3, 4, 5, 5, 3],
-    # [3, 2, 3, 0, 4, 2, 3, 4, 4, 2],
-    # [5, 4, 5, 4, 0, 4, 3, 2, 2, 4],
-    # [3, 2, 3, 2, 4, 0, 3, 4, 4, 2],
-    # [4, 3, 4, 3, 3, 3, 0, 3, 3, 3],
-    # [5, 4, 5, 4, 2, 4, 3, 0, 2, 4],
-    # [5, 4, 5, 4, 2, 4, 3, 2, 0, 4],
-    # [3, 2, 3, 2, 4, 2, 3, 4, 4, 0]
-
-# ])
-
 
 def create_upper_triangular_matrix(matrix: np.array) -> np.array:
     # Tworzymy macierz górnotrójkątną żeby uniknąć niejednoznaczności
@@ -85,8 +59,6 @@ def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex) 
             if a < i and b < i:
                 if not matrix[a][i] == distances_to_merge_vertex[a] + distances_to_merge_vertex[i] \
                         or not matrix[b][i] == distances_to_merge_vertex[b] + distances_to_merge_vertex[i]:
-                    print(distances_to_merge_vertex[a] + distances_to_merge_vertex[i])
-                    print(distances_to_merge_vertex[b] + distances_to_merge_vertex[i])
                     return False
     return True
 
@@ -153,27 +125,18 @@ def make_graph_from_leaves(matrix):
             for i in range(smallest_distance):
                 new_subgraph[i][i+1] = 1
             new_subgraph[int(distances_to_merge_vertex_difference)][int(distances_to_merge_vertex_difference)] = 2
-            print("test")
-            print(np.unravel_index(new_subgraph.argmax(), new_subgraph.shape))
-            print(new_subgraph)
             merged_subgraph = merge_subgraphs(new_subgraph, first_subgraph, True)
-            print(np.unravel_index(merged_subgraph.argmax(), merged_subgraph.shape))
-            print(merged_subgraph)
-            print("\n\n\n")
             merged_subgraph = merge_subgraphs(merged_subgraph, second_subgraph, False)
             # Stworzenie macierzy B' w której X i Y sa usunenie a Z jest dodane
             new_masked_matrix.mask = np.ma.nomask
             b = np.hstack((new_masked_matrix, np.atleast_2d(distances_to_merge_vertex).T))
-            matrix = b.data
             b = np.vstack((b, [0] * b.shape[1]))
-            matrix = b.data
             b = np.delete(b, [smallest_distance_idx[0], smallest_distance_idx[1]], 0)
             b = np.delete(b, [smallest_distance_idx[0], smallest_distance_idx[1]], 1)
             b.mask = np.ma.nomask
             subgraphs_matrix.pop(max(smallest_distance_idx[0], smallest_distance_idx[1]))
             subgraphs_matrix.pop(min(smallest_distance_idx[0], smallest_distance_idx[1]))
             subgraphs_matrix.append(merged_subgraph)
-            # print("merged subgraphs")
 
             bad_pair = False
 
@@ -188,7 +151,6 @@ def make_graph_from_leaves(matrix):
                 # in this step we can return -1, non any pair from input create valid pair
                 return -1
 
-    print(merged_subgraph)
     return merged_subgraph
 
 
@@ -218,9 +180,3 @@ def run():
 
 if __name__ == '__main__':
     run()
-
-
-# TODO : zrobic plik wykonywalny
-# TODO : przygotowac pliki testowe - Done
-# TODO : szukam pliku wejsciowego w katalogu z zadaniem - Done
-# TODO : generator instancji
