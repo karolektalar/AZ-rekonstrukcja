@@ -141,10 +141,7 @@ def make_graph_from_leaves(matrix):
             bad_pair = False
 
         else:
-            print(f"old masked = {new_masked_matrix}")
             new_masked_matrix[smallest_distance_idx[0], smallest_distance_idx[1]] = np.ma.masked
-            print(f"new masked = {new_masked_matrix}")
-            print(new_masked_matrix.mask)
             b = new_masked_matrix
             bad_pair = True
             if False not in new_masked_matrix.mask:
