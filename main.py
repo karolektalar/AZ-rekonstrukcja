@@ -3,6 +3,8 @@ from glob import glob
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
+import graph_generator
+import datetime
 
 matrix_1 = np.array([
     [0, 2, 2, 2],
@@ -10,31 +12,6 @@ matrix_1 = np.array([
     [2, 2, 0, 2],
     [2, 2, 2, 0],
 ])
-# przyklad w ktorym pierwsza para jest zla
-# matrix_2 = np.array([
-#     [0, 2, 3, 3],
-#     [2, 0, 3, 3],
-#     [3, 3, 0, 2],
-#     [3, 3, 2, 0]
-    # [0, 3, 2, 3, 5, 3],
-    # [3, 0, 3, 2, 4, 2],
-    # [2, 3, 0, 3, 5, 3],
-    # [3, 2, 3, 0, 4, 2],
-    # [5, 4, 5, 4, 0, 4],
-    # [3, 2, 3, 2, 4, 0]
-
-    # [0, 3, 2, 3, 5, 3, 4, 5, 5, 3],
-    # [3, 0, 3, 2, 4, 2, 3, 4, 4, 2],
-    # [2, 3, 0, 3, 5, 3, 4, 5, 5, 3],
-    # [3, 2, 3, 0, 4, 2, 3, 4, 4, 2],
-    # [5, 4, 5, 4, 0, 4, 3, 2, 2, 4],
-    # [3, 2, 3, 2, 4, 0, 3, 4, 4, 2],
-    # [4, 3, 4, 3, 3, 3, 0, 3, 3, 3],
-    # [5, 4, 5, 4, 2, 4, 3, 0, 2, 4],
-    # [5, 4, 5, 4, 2, 4, 3, 2, 0, 4],
-    # [3, 2, 3, 2, 4, 2, 3, 4, 4, 0]
-
-# ])
 
 
 def create_upper_triangular_matrix(matrix: np.array) -> np.array:
@@ -85,8 +62,6 @@ def check_if_distances_are_correct(matrix: np, a, b, distances_to_merge_vertex) 
             if a < i and b < i:
                 if not matrix[a][i] == distances_to_merge_vertex[a] + distances_to_merge_vertex[i] \
                         or not matrix[b][i] == distances_to_merge_vertex[b] + distances_to_merge_vertex[i]:
-                    print(distances_to_merge_vertex[a] + distances_to_merge_vertex[i])
-                    print(distances_to_merge_vertex[b] + distances_to_merge_vertex[i])
                     return False
     return True
 
@@ -126,12 +101,12 @@ def merge_subgraphs(new_subgraph, first_subgraph, first: bool):
 
 
 def make_graph_from_leaves(matrix):
+    z = 0
     subgraphs_matrix = [0] * len(matrix[0])
     b = matrix
     bad_pair = False
 
     while b.shape[0] > 1:
-
         if not bad_pair:
             upper_triangular_matrix = create_upper_triangular_matrix(b)
             new_masked_matrix = np.ma.MaskedArray(upper_triangular_matrix, upper_triangular_matrix <= 0)
@@ -153,43 +128,35 @@ def make_graph_from_leaves(matrix):
             for i in range(smallest_distance):
                 new_subgraph[i][i+1] = 1
             new_subgraph[int(distances_to_merge_vertex_difference)][int(distances_to_merge_vertex_difference)] = 2
-            print("test")
-            print(np.unravel_index(new_subgraph.argmax(), new_subgraph.shape))
-            print(new_subgraph)
             merged_subgraph = merge_subgraphs(new_subgraph, first_subgraph, True)
-            print(np.unravel_index(merged_subgraph.argmax(), merged_subgraph.shape))
-            print(merged_subgraph)
-            print("\n\n\n")
             merged_subgraph = merge_subgraphs(merged_subgraph, second_subgraph, False)
             # Stworzenie macierzy B' w której X i Y sa usunenie a Z jest dodane
             new_masked_matrix.mask = np.ma.nomask
             b = np.hstack((new_masked_matrix, np.atleast_2d(distances_to_merge_vertex).T))
-            matrix = b.data
             b = np.vstack((b, [0] * b.shape[1]))
-            matrix = b.data
             b = np.delete(b, [smallest_distance_idx[0], smallest_distance_idx[1]], 0)
             b = np.delete(b, [smallest_distance_idx[0], smallest_distance_idx[1]], 1)
             b.mask = np.ma.nomask
             subgraphs_matrix.pop(max(smallest_distance_idx[0], smallest_distance_idx[1]))
             subgraphs_matrix.pop(min(smallest_distance_idx[0], smallest_distance_idx[1]))
             subgraphs_matrix.append(merged_subgraph)
-            # print("merged subgraphs")
 
             bad_pair = False
 
         else:
-            print(f"old masked = {new_masked_matrix}")
+            # print(f"old masked = {new_masked_matrix}")
             new_masked_matrix[smallest_distance_idx[0], smallest_distance_idx[1]] = np.ma.masked
-            print(f"new masked = {new_masked_matrix}")
-            print(new_masked_matrix.mask)
+            # print(f"new masked = {new_masked_matrix}")
+            # print(new_masked_matrix.mask)
             b = new_masked_matrix
             bad_pair = True
             if False not in new_masked_matrix.mask:
+                print("error")
                 # in this step we can return -1, non any pair from input create valid pair
                 return -1
 
-    print(merged_subgraph)
-    return merged_subgraph
+    # print(merged_subgraph)
+    return b
 
 
 def run():
@@ -197,23 +164,29 @@ def run():
     # look for input.csv
     input_files = glob('*.txt') + glob('*.csv')
     output_file = open('result.txt', 'w')
-    try:
-        for file in input_files:
-            if file != 'requirements.txt' and file != "result.txt":
-                rows_to_skip = 0
-                if 'csv' in file:
-                    rows_to_skip = 1
-                input_matrix = np.loadtxt(file, delimiter=",", skiprows=rows_to_skip)
-                res = make_graph_from_leaves(input_matrix)
-                output_file.write(f"\n*******************************   OUTPUT DLA PLIKU {file}    *******************************\n")
+    # try:
+    #     for file in input_files:
+    #         if file != 'requirements.txt' and file != "result.txt":
+    #             rows_to_skip = 0
+    #             if 'csv' in file:
+    #                 rows_to_skip = 1
+    #             input_matrix = np.loadtxt(file, delimiter=",", skiprows=rows_to_skip)
+    for i in range(39):
+        for j in range(10):
+            print(str(25*(i+1)) + " " + str(j))
+            graph = graph_generator.generate_example((i+1)*25)
+            first_time = datetime.datetime.now()
+            result = make_graph_from_leaves(graph)
+            later_time = datetime.datetime.now()
+            difference = later_time - first_time
+            output_file.write(str(25*(i+1)) + "," + str(difference.seconds)+'\n')
+            # G = nx.from_numpy_array(result)
+            # nx.draw(G)
 
-                output_file.write(str(res))
-                G = nx.from_numpy_array(res)
-                nx.draw(G)
-                plt.show()
-        output_file.close()
-    except OSError:
-        print("Plik wejsciowy nie znaleziony. Prosze stworzyc plik input.csv w tym katalogu")
+            # plt.show()
+    output_file.close()
+    # except OSError:
+    #     print("Plik wejsciowy nie znaleziony. Prosze stworzyc plik input.csv w tym katalogu")
 
 
 if __name__ == '__main__':
@@ -221,6 +194,4 @@ if __name__ == '__main__':
 
 
 # TODO : zrobic plik wykonywalny
-# TODO : przygotowac pliki testowe - Done
-# TODO : szukam pliku wejsciowego w katalogu z zadaniem - Done
 # TODO : generator instancji

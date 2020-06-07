@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def generate_random_tree(number_of_nodes: int) -> nx.Graph :
