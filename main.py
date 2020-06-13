@@ -1,5 +1,6 @@
 import numpy as np
 from glob import glob
+import pkg_resources.py2_warn
 # import matplotlib.pyplot as plt
 # import networkx as nx
 # import pandas as pd
@@ -182,8 +183,24 @@ def run():
                 input_matrix = np.loadtxt(file, delimiter=",", skiprows=rows_to_skip)
                 res = make_graph_from_leaves(input_matrix)
                 output_file.write(f"\n*******************************   OUTPUT DLA PLIKU {file}    *******************************\n")
-
+                neighbour_list = []
+                for i in range(len(res[0])):
+                    for j in range(i, len(res[0])):
+                        res[j][i] = res[i][j]
+                output_file.write("Macierz sąsiedztwa:\n")
                 output_file.write(str(res))
+                output_file.write("\nLista sąsiedztwa: \n")
+                for i in range(len(res[0])):
+                    list = []
+                    for j in range(len(res[0])):
+                        if res[i][j] == 1:
+                            list.append(j)
+                    neighbour_list.append(list)
+
+                    output_file.write(str(i) + ": " + str(list) + "\n")
+
+
+
                 # G = nx.from_numpy_array(res)
                 # nx.draw(G)
                 # plt.show()
